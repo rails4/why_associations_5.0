@@ -21,7 +21,8 @@ setwd("~/Repos/rails4/why_associations_5.0/db")
 
 load("data-raw/flights.rda")
 ls()
-# convert to tibble
+flights
+# A tibble: 509,083 × 19
 
 my_db = src_sqlite("development.sqlite3", create = FALSE)
 flights_sqlite = copy_to(
