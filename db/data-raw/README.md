@@ -38,3 +38,35 @@ arrange(flights_sqlite, year, month, day)
 mutate(flights_sqlite, speed = air_time / distance)
 summarise(flights_sqlite, delay = mean(dep_time))
 ```
+
+``````sh
+sqlite3 development.sqlite3
+sqlite> .help
+sqlite> .schema --indent
+```
+```sql
+CREATE TABLE `flights`(
+  `year` INTEGER,
+  `month` INTEGER,
+  `day` INTEGER,
+  `dep_time` INTEGER,
+  `sched_dep_time` INTEGER,
+  `dep_delay` REAL,
+  `arr_time` INTEGER,
+  `sched_arr_time` INTEGER,
+  `arr_delay` REAL,
+  `carrier` TEXT,
+  `flight` INTEGER,
+  `tailnum` TEXT,
+  `origin` TEXT,
+  `dest` TEXT,
+  `air_time` REAL,
+  `distance` REAL,
+  `hour` REAL,
+  `minute` REAL,
+  `time_hour` REAL
+);
+CREATE INDEX `flights_year_month_day` ON `flights`(`year`, `month`, `day`);
+CREATE INDEX `flights_carrier` ON `flights`(`carrier`);
+CREATE INDEX `flights_tailnum` ON `flights`(`tailnum`);
+```
