@@ -9,6 +9,8 @@ Importing data into databases:
 * [The _dplyr_ vignette on Databases](https://cran.r-project.org/web/packages/dplyr/vignettes/databases.html)
 * [Getting started with MongoDB in R](https://cran.r-project.org/web/packages/mongolite/vignettes/intro.html)
 
+How to add **id** attribute to existing tibble?
+
 Load data into RStudio:
 
 ```r
