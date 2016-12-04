@@ -52,6 +52,7 @@ setwd("~/Repos/rails4/why_associations_5.0/db")
 
 library(tibble)
 library(dplyr)
+library(DBI)
 
 load("data/flights-2014.rda")
 ls()
@@ -67,6 +68,8 @@ flights <- flights %>%
 #   air_time <dbl>, id <int>
 
 my_db = src_sqlite("development.sqlite3", create = FALSE)
+mydb <- dbConnect(RSQLite::SQLite(), "development.sqlite3")
+dbWriteTable(mydb, "flights", flights)
 
 # see http://www.sqlite.org/datatype3.html
 # flights = flights %>%
