@@ -32,12 +32,16 @@ lapply(missing, download_month, year = 2014)
 
 get_nyc <- function(path) {
   col_types <- cols(
-    DepTime = col_integer(),
-    ArrTime = col_integer(),
-    CRSDepTime = col_integer(),
-    CRSArrTime = col_integer(),
+    DepTime = col_integer(),         # local time: hhmm
+    ArrTime = col_integer(),         # local time: hhmm
+    CRSDepTime = col_integer(),      # local time: hhmm
+    CRSArrTime = col_integer(),      # local time: hhmm
     Carrier = col_character(),
     UniqueCarrier = col_character()
+    # AirTime = col_integer(),       # in minutes
+    # DepDelay = col_integer(),
+    # ArrDelay = col_integer(),
+    # Distance = col_double()        # in miles
   )
   read_csv(path, col_types = col_types) %>%
     select(
@@ -66,14 +70,20 @@ make_datetime_100 <- function(year, month, day, time) {
 }
 
 flights <- flights %>%
-  filter(!is.na(dep_time), !is.na(arr_time)) %>%
+  filter(!is.na(dep_time), !is.na(arr_time), !is.na(dep_delay), !is.na(arr_delay), !is.na(air_time)) %>%
   mutate(
     dep_time = make_datetime_100(year, month, day, dep_time),
     arr_time = make_datetime_100(year, month, day, arr_time),
     sched_dep_time = make_datetime_100(year, month, day, sched_dep_time),
     sched_arr_time = make_datetime_100(year, month, day, sched_arr_time)
   ) %>%
-  select(origin, dest, distance, ends_with("delay"), ends_with("time")) %>%
-  mutate(id = row_number())
+  select(origin, dest, distance, ends_with("delay"), ends_with("time"), tailnum)
+
+flights = flights %>%
+  mutate(
+    dep_delay = as.integer(dep_delay),
+    arr_delay = as.integer(arr_delay),
+    air_time = as.integer(air_time)
+  )
 
 save(flights, file = "data/flights-2014.rda", compress = "bzip2")
