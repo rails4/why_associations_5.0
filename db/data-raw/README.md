@@ -31,7 +31,17 @@ flights
 # ... with 5,690,173 more rows, and 4 more variables: arr_time <dttm>, sched_arr_time <dttm>,
 #   air_time <dbl>, id <int>
 
-my_db = src_sqlite("development.sqlite3", create = FALSE)
+my_db = src_sqlite("development.sqlite3", create = TRUE)
+
+# see http://www.sqlite.org/datatype3.html
+
+flights = flights %>%
+  mutate(
+    dep_time = as.character(dep_time),
+    sched_dep_time = as.character(sched_dep_time),
+    arr_time = as.character(arr_time),
+    sched_arr_time = as.character(sched_arr_time))
+
 flights_sqlite = copy_to(
   my_db,
   flights,
