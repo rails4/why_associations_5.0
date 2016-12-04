@@ -28,7 +28,7 @@ lapply(missing, get_asos)
 # Load ------------------------------------------------------------------------
 
 paths <- dir("data-raw/weather", full.names = TRUE)
-all <- lapply(paths, read_csv, skip = 4, na = "M", col_names = FALSE)
+all <- lapply(paths, read_csv, skip = 6, na = "M", col_names = FALSE)
 
 raw <- bind_rows(all)
 names(raw) <- c("station", "time", "tmpf", "dwpf", "relh", "drct", "sknt",
@@ -57,4 +57,4 @@ weather <- raw %>%
   )
 
 write_csv(weather, "data-raw/weather.csv")
-save(weather, file = "data/weather.rda")
+save(weather, file = "data/weather.rda", compress = "bzip2")
