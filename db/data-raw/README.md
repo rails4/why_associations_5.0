@@ -14,61 +14,83 @@ How to add **id** attribute to existing tibble?
 Load data into RStudio:
 
 ```r
-source("data-raw/flights-2014.r")
+setwd("~/Repos/rails4/why_associations_5.0/db")
+# source("data-raw/flights-2014.r")
 
 library(tibble)
 library(dplyr)
 
-setwd("~/Repos/rails4/why_associations_5.0/db")
-
-load("data-raw/flights.rda")
+load("data/flights-2014.rda")
 ls()
 flights
-# A tibble: 509,083 × 19
+# A tibble: 5,690,183 × 11
+#    origin  dest distance dep_delay arr_delay            dep_time      sched_dep_time
+#     <chr> <chr>    <dbl>     <dbl>     <dbl>              <dttm>              <dttm>
+# 1     PDX   ANC     1542        96        70 2014-01-01 00:01:00 2014-01-01 22:25:00
+# 2     SFO   PHX      651       109       106 2014-01-01 00:01:00 2014-01-01 22:12:00
+# ... with 5,690,173 more rows, and 4 more variables: arr_time <dttm>, sched_arr_time <dttm>,
+#   air_time <dbl>, id <int>
 
 my_db = src_sqlite("development.sqlite3", create = FALSE)
 flights_sqlite = copy_to(
   my_db,
   flights,
   temporary = FALSE,
-  indexes = list(c("year", "month", "day"), "carrier", "tailnum")
+  indexes = list("origin", "dest")
 )
 
-select(flights_sqlite, year:day, dep_delay, arr_delay)
+select(flights_sqlite, dep_delay, arr_delay)
 filter(flights_sqlite, dep_delay > 240)
-arrange(flights_sqlite, year, month, day)
+arrange(flights_sqlite, dep_time)
 mutate(flights_sqlite, speed = air_time / distance)
-summarise(flights_sqlite, delay = mean(dep_time))
+summarise(flights_sqlite, delay = mean(dep_delay))
 ```
 
+Bash:
+```sh
+rails db:schema:dump
+cat db/schema.rb
+```
+```ruby
+create_table "flights", id: false, force: :cascade do |t|
+  t.text    "origin"
+  t.text    "dest"
+  t.        "distance"
+  t.        "dep_delay"
+  t.        "arr_delay"
+  t.        "dep_time"
+  t.        "sched_dep_time"
+  t.        "arr_time"
+  t.        "sched_arr_time"
+  t.        "air_time"
+  t.integer "id"
+  t.index ["dest"], name: "flights_dest"
+  t.index ["id"], name: "flights_id"
+  t.index ["origin"], name: "flights_origin"
+end
+```
+
+SQLite shell:
 ``````sh
 sqlite3 development.sqlite3
-sqlite> .help
-sqlite> .schema --indent
+sqlite> .schema --indent flights
 ```
 ```sql
 CREATE TABLE `flights`(
-  `year` INTEGER,
-  `month` INTEGER,
-  `day` INTEGER,
-  `dep_time` INTEGER,
-  `sched_dep_time` INTEGER,
-  `dep_delay` REAL,
-  `arr_time` INTEGER,
-  `sched_arr_time` INTEGER,
-  `arr_delay` REAL,
-  `carrier` TEXT,
-  `flight` INTEGER,
-  `tailnum` TEXT,
   `origin` TEXT,
   `dest` TEXT,
-  `air_time` REAL,
   `distance` REAL,
-  `hour` REAL,
-  `minute` REAL,
-  `time_hour` REAL
+  `dep_delay` REAL,
+  `arr_delay` REAL,
+  `dep_time` REAL,
+  `sched_dep_time` REAL,
+  `arr_time` REAL,
+  `sched_arr_time` REAL,
+  `air_time` REAL,
+  `id` INTEGER
 );
-CREATE INDEX `flights_year_month_day` ON `flights`(`year`, `month`, `day`);
-CREATE INDEX `flights_carrier` ON `flights`(`carrier`);
-CREATE INDEX `flights_tailnum` ON `flights`(`tailnum`);
+CREATE INDEX `flights_id` ON `flights`(`id`);
+CREATE INDEX `flights_origin` ON `flights`(`origin`);
+CREATE INDEX `flights_dest` ON `flights`(`dest`);
+.q
 ```

@@ -40,6 +40,23 @@ ActiveRecord::Schema.define(version: 5) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "flights", id: false, force: :cascade do |t|
+    t.text    "origin"
+    t.text    "dest"
+    t.        "distance"
+    t.        "dep_delay"
+    t.        "arr_delay"
+    t.        "dep_time"
+    t.        "sched_dep_time"
+    t.        "arr_time"
+    t.        "sched_arr_time"
+    t.        "air_time"
+    t.integer "id"
+    t.index ["dest"], name: "flights_dest"
+    t.index ["id"], name: "flights_id"
+    t.index ["origin"], name: "flights_origin"
+  end
+
   create_table "orders", force: :cascade do |t|
     t.datetime "order_date"
     t.string   "order_number"
@@ -47,6 +64,12 @@ ActiveRecord::Schema.define(version: 5) do
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
     t.index ["customer_id"], name: "index_orders_on_customer_id"
+  end
+
+  create_table "sqlite_stat1", id: false, force: :cascade do |t|
+    t. "tbl"
+    t. "idx"
+    t. "stat"
   end
 
 end
