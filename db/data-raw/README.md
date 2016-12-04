@@ -67,6 +67,15 @@ flights <- flights %>%
 # ... with 5,690,173 more rows, and 4 more variables: arr_time <dttm>, sched_arr_time <dttm>,
 #   air_time <dbl>, id <int>
 
+# import into MongoDB
+# https://cran.r-project.org/web/packages/mongolite/vignettes/intro.html
+library(mongolite)
+m <- mongo(collection = "flights")
+m$insert(flights)
+```
+
+
+```r
 my_db = src_sqlite("development.sqlite3", create = FALSE)
 mydb <- dbConnect(RSQLite::SQLite(), "development.sqlite3")
 dbWriteTable(mydb, "flights", flights)
