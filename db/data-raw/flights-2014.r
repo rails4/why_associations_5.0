@@ -1,5 +1,6 @@
 library(dplyr)
 library(readr)
+library(lubridate)
 
 flight_url <- function(year = 2014, month) {
   base_url <- "http://www.transtats.bts.gov/Download/"
@@ -47,7 +48,7 @@ get_nyc <- function(path) {
       origin = Origin, dest = Dest,
       air_time = AirTime, distance = Distance
     ) %>%
-    filter(origin %in% c("JFK", "LGA", "EWR")) %>%
+    # filter(origin %in% c("JFK", "LGA", "EWR")) %>%
     mutate(
       hour = sched_dep_time %/% 100,
       minute = sched_dep_time %% 100,
@@ -59,5 +60,20 @@ get_nyc <- function(path) {
 all <- lapply(dir("data-raw/flights", full.names = TRUE), get_nyc)
 flights <- bind_rows(all)
 flights$tailnum[flights$tailnum == ""] <- NA
+
+make_datetime_100 <- function(year, month, day, time) {
+  make_datetime(year, month, day, time %/% 100, time %% 100)
+}
+
+flights <- flights %>%
+  filter(!is.na(dep_time), !is.na(arr_time)) %>%
+  mutate(
+    dep_time = make_datetime_100(year, month, day, dep_time),
+    arr_time = make_datetime_100(year, month, day, arr_time),
+    sched_dep_time = make_datetime_100(year, month, day, sched_dep_time),
+    sched_arr_time = make_datetime_100(year, month, day, sched_arr_time)
+  ) %>%
+  select(origin, dest, distance, ends_with("delay"), ends_with("time")) %>%
+  mutate(id = row_number())
 
 save(flights, file = "data/flights-2014.rda", compress = "bzip2")
