@@ -80,6 +80,12 @@ create_table "flights", id: false, force: :cascade do |t|
 end
 ```
 
+Handling DateTimes on Rails console:
+```ruby
+f1 = Flight.first
+DateTime.parse(f1.dep_time)
+```
+
 SQLite shell:
 ``````sh
 sqlite3 development.sqlite3
