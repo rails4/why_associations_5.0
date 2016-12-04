@@ -11,6 +11,39 @@ Importing data into databases:
 
 How to add **id** attribute to existing tibble?
 
+First, generate migration and run it:
+```sh
+rails g migration CreateFlights \
+  origin dest distance:integer dep_delay:integer arr_delay:integer \
+  air_time:integer tailnum \
+  dep_time:datetime sched_dep_time:datetime arr_time:datetime sched_arr_time:datetime
+rails db:migrate
+```
+Add indexes:
+```ruby
+# migrate/006_create_flights.rb
+class CreateFlights < ActiveRecord::Migration[5.0]
+  def change
+    create_table :flights do |t|
+      t.string :origin
+      t.string :dest
+      t.integer :distance
+      t.integer :dep_delay
+      t.integer :arr_delay
+      t.datetime :dep_time
+      t.datetime :sched_dep_time
+      t.datetime :arr_time
+      t.datetime :sched_arr_time
+      t.integer :air_time
+      t.string :tailnum
+
+      t.index ['origin'], name: 'index_flights_on_origin'
+      t.index ['dest'], name: 'index_flights_on_dest'
+    end
+  end
+end
+```
+
 Load data into RStudio:
 
 ```r
@@ -22,7 +55,9 @@ library(dplyr)
 
 load("data/flights-2014.rda")
 ls()
-flights
+
+flights <- flights %>%
+  arrange(dep_time)
 # A tibble: 5,690,183 × 11
 #    origin  dest distance dep_delay arr_delay            dep_time      sched_dep_time
 #     <chr> <chr>    <dbl>     <dbl>     <dbl>              <dttm>              <dttm>
@@ -31,22 +66,21 @@ flights
 # ... with 5,690,173 more rows, and 4 more variables: arr_time <dttm>, sched_arr_time <dttm>,
 #   air_time <dbl>, id <int>
 
-my_db = src_sqlite("development.sqlite3", create = TRUE)
+my_db = src_sqlite("development.sqlite3", create = FALSE)
 
 # see http://www.sqlite.org/datatype3.html
-
-flights = flights %>%
-  mutate(
-    dep_time = as.character(dep_time),
-    sched_dep_time = as.character(sched_dep_time),
-    arr_time = as.character(arr_time),
-    sched_arr_time = as.character(sched_arr_time))
+# flights = flights %>%
+#   mutate(
+#     dep_time = as.character(dep_time),
+#     sched_dep_time = as.character(sched_dep_time),
+#     arr_time = as.character(arr_time),
+#     sched_arr_time = as.character(sched_arr_time))
 
 flights_sqlite = copy_to(
   my_db,
   flights,
-  temporary = FALSE,
-  indexes = list("origin", "dest")
+  temporary = FALSE
+  # indexes = list("origin", "dest")
 )
 
 select(flights_sqlite, dep_delay, arr_delay)
