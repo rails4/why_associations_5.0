@@ -1,7 +1,7 @@
 library(dplyr)
 library(readr)
 library(purrr)
-library(geonames) # to determine timezones
+# library(geonames) # to determine timezones
 
 if (!file.exists("data-raw/airports.dat")) {
   download.file(
