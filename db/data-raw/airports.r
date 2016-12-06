@@ -12,21 +12,21 @@ if (!file.exists("data-raw/airports.dat")) {
 
 # file format: http://openflights.org/data.html
 # the last three fields:
-#   timezone -- hours offset from UTC
+#   tz -- hours offset from UTC
 #               fractional hours are expressed as decimals,
-#              eg. India is 5.5
+#               eg. India is 5.5
 #   dst -- daylight savings time
 #          one of E (Europe), A (US/Canada), S (South America), O (Australia),
 #          Z (New Zealand), N (None) or U (Unknown)
-#   tz database time zone -- tz Olson format
+#   tzone database time zone -- tz Olson format
 
 raw <- read_csv("data-raw/airports.dat",
-  col_names = c("id", "name", "city", "country", "faa", "icao", "lat", "lon", "alt", "timezone", "dst", "tz")
+  col_names = c("id", "name", "city", "country", "faa", "icao", "lat", "lon", "alt", "tz", "dst", "tzone")
 )
 
 airports <- raw %>%
   filter(country == "United States", faa != "") %>%
-  select(faa, name, lat, lon, alt, timezone, tz, dst) %>%
+  select(faa, name, lat, lon, alt, tz, dst, tzone) %>%
   group_by(faa) %>% slice(1) %>% ungroup() # take first if duplicated
 
 # no geonamesUsername set. See http://geonames.wordpress.com/2010/03/16/ddos-part-ii/
