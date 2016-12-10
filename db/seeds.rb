@@ -48,3 +48,31 @@ Author.find(4).articles << Article.find(2)
 Author.find(5).articles << Article.find(2)
 Author.find(6).articles << Article.find(3)
 Author.find(7).articles << Article.find(3)
+
+# rails console
+#
+# require 'cvs'
+
+# csv = CSV.new(open("db/a.csv"), :headers => true, :header_converters => :symbol, :converters => :all)
+# csv.each { |row| puts row }
+
+# csv = CSV.new(open("db/a.csv"), :headers => true, :header_converters => :symbol, :converters => :all)
+# csv.each { |row| row.delete(0); ap row.to_hash }
+# {
+#       :faa => "0P2",
+#      :name => "Shoestring Aviation Airfield",
+#       :lat => 39.7948244,
+#       :lon => -76.6471914,
+#       :alt => 1000,
+#        :tz => -5,
+#       :dst => "U",
+#     :tzone => "America/New_York"
+# }
+
+# Zlib::GzipReader.open("db/a.csv.gz") do |gz|
+#   csv = CSV.new(gz, :headers => true, :header_converters => :symbol, :converters => :all)
+#   csv.each do |row|
+#     row.delete(0)
+#     ap row
+#   end
+# end
